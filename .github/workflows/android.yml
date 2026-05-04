@@ -20,19 +20,30 @@ jobs:
           
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          android-sdk-file: android-sdk.tar.gz
-        
-      - name: Set Android SDK environment
-        run: |
-          export ANDROID_HOME=$HOME/Android/Sdk
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
         
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
         
+      - name: Debug project structure
+        run: |
+          echo "Project structure:"
+          ls -la
+          ls -la app/
+          ls -la gradle/
+          
       - name: Build with Gradle
-        run: ./gradlew assembleDebug
+        run: |
+          ./gradlew assembleDebug --info
+        
+      - name: Check APK
+        run: |
+          if [ -f app/build/outputs/apk/debug/app-debug.apk ]; then
+            echo "✅ APK generated successfully"
+            ls -la app/build/outputs/apk/debug/
+          else
+            echo "❌ APK not found"
+            find app/build -name "*.apk" || echo "No APK found"
+          fi
         
       - name: Upload APK
         uses: actions/upload-artifact@v3
